@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mai-moji: Animal Edition 🐾</title>
+  <style>
+    :root {
+      --bg-color: #f3effe;
+      --card-bg: #ffffff;
+      --primary: #8a4fff;
+      --primary-hover: #7333ea;
+      --accent-green: #2ecc71;
+      --accent-red: #e74c3c;
+      --accent-orange: #f39c12;
+      --text-color: #2d2b3a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 15px;
+    }
+
+    .app-container {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 500px;
+      border-radius: 24px;
+      padding: 25px;
+      box-shadow: 0 12px 30px rgba(138, 79, 255, 0.18);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    /* HOME SCREEN */
+    .main-title {
+      color: var(--primary);
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .sub-title {
+      font-size: 0.95rem;
+      color: #666;
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .mode-btn {
+      width: 100%;
+      padding: 18px;
+      margin-bottom: 15px;
+      border: 2px solid var(--primary);
+      background: #f8f5ff;
+      color: var(--primary);
+      border-radius: 16px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .mode-btn span {
+      font-size: 0.85rem;
+      font-weight: normal;
+      color: #777;
+    }
+
+    .mode-btn:hover {
+      background: var(--primary);
+      color: white;
+    }
+    .mode-btn:hover span {
+      color: #eee;
+    }
+
+    /* BACK BUTTON */
+    .back-btn {
+      align-self: flex-start;
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* ASK MODE */
+    .game-stats {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+
+    .emoji-display-card {
+      background: #faf8ff;
+      border: 3px dashed var(--primary);
+      border-radius: 20px;
+      width: 100%;
+      height: 220px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 7rem;
+      margin-bottom: 25px;
+      user-select: none;
+    }
+
+    .action-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .btn-act {
+      border: none;
+      padding: 15px 5px;
+      border-radius: 12px;
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+    .btn-act:active { transform: scale(0.95); }
+    .btn-wrong { background: var(--accent-red); }
+    .btn-pass { background: var(--accent-orange); }
+    .btn-correct { background: var(--accent-green); }
+
+    /* SCORE SCREEN */
+    .result-card {
+      text-align: center;
+      padding: 20px 0;
+    }
+    .result-score {
+      font-size: 3rem;
+      color: var(--primary);
+      font-weight: bold;
+      margin: 15px 0;
+    }
+
+    /* GUESS MODE */
+    .grid-instruction {
+      font-size: 0.95rem;
+      color: #555;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .animal-num-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      width: 100%;
+      max-height: 420px;
+      overflow-y: auto;
+      padding-right: 5px;
+    }
+
+    .num-card {
+      background: #f8f6ff;
+      border: 2px solid #e2d8fe;
+      border-radius: 12px;
+      padding: 10px 5px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .num-badge {
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: var(--primary);
+      background: #ebe3ff;
+      padding: 2px 6px;
+      border-radius: 8px;
+      margin-bottom: 4px;
+    }
+
+    .num-emoji {
+      font-size: 2.2rem;
+      user-select: none;
+    }
+
+    .animal-num-grid::-webkit-scrollbar {
+      width: 6px;
+    }
+    .animal-num-grid::-webkit-scrollbar-thumb {
+      background: #d1bfff;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- SCREEN 0: HOME / MODE SELECT -->
+  <div id="screen-home" class="screen active">
+    <h1 class="main-title">Mai-moji 🐾</h1>
+    <p class="sub-title">Animal Edition — Choose Game Mode!</p>
+
+    <button class="mode-btn" onclick="startAskMode()">
+      🎭 Describer / Ask Mode
+      <span>5 random animals. Describe & score (+20 pts each)</span>
+    </button>
+
+    <button class="mode-btn" onclick="openGuessMode()">
+      🔢 Numbered Animal List (Guesser)
+      <span>36 animals grid with numbers</span>
+    </button>
+  </div>
+
+  <!-- SCREEN 1: ASK MODE (GAMEPLAY) -->
+  <div id="screen-ask" class="screen">
+    <button class="back-btn" onclick="showScreen('screen-home')">⬅ Main Menu</button>
+    
+    <div class="game-stats">
+      <span>Question: <span id="question-progress">1/5</span></span>
+      <span>Score: <span id="current-score">0</span></span>
+    </div>
+
+    <div class="emoji-display-card" id="current-emoji-display">
+      🐶
+    </div>
+
+    <div class="action-buttons">
+      <button class="btn-act btn-wrong" onclick="handleAnswer('wrong')">❌ Wrong</button>
+      <button class="btn-act btn-pass" onclick="handleAnswer('pass')">⏭️ Skip</button>
+      <button class="btn-act btn-correct" onclick="handleAnswer('correct')">✅ Correct</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: ASK MODE (SCORE) -->
+  <div id="screen-score" class="screen">
+    <div class="result-card">
+      <h2>Game Over! 🎉</h2>
+      <div class="result-score" id="final-score">0 / 100</div>
+      <p id="score-comment">Awesome job!</p>
+    </div>
+    <button class="mode-btn" onclick="startAskMode()" style="margin-top: 20px;">
+      🔄 Play Again
+    </button>
+    <button class="back-btn" onclick="showScreen('screen-home')" style="align-self: center;">
+      Back to Main Menu
+    </button>
+  </div>
+
+  <!-- SCREEN 3: GUESS MODE (GRID) -->
+  <div id="screen-guess" class="screen">
+    <button class="back-btn" onclick="showScreen('screen-home')">⬅ Main Menu</button>
+    <p class="grid-instruction">Numbered Animal Reference (1 - 36):</p>
+    
+    <div class="animal-num-grid" id="animal-num-grid">
+      <!-- JS fills 36 animals -->
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const cleanAnimals = [
+    "🐶", "🐱", "🐭", "🐹", "🐰", "🦊", 
+    "🐻", "🐼", "🦝", "🦁", "🐯", "🦒", 
+    "🐘", "🦏", "🦛", "🐮", "🐷", "🐸", 
+    "🐵", "🐔", "🐧", "🐦", "🦆", "🦅", 
+    "🦉", "🦇", "🐺", "🐗", "🐴", "🦄", 
+    "🐝", "🐛", "🦋", "🐌", "🐙", "🐬"
+  ];
+
+  const TOTAL_QUESTIONS = 5;
+  const POINTS_PER_CORRECT = 20;
+
+  let gameQueue = [];
+  let score = 0;
+  let currentQuestionIndex = 0;
+
+  function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+  }
+
+  /* --- ASK MODE --- */
+  function startAskMode() {
+    // Pick 5 random animals
+    gameQueue = [...cleanAnimals].sort(() => Math.random() - 0.5).slice(0, TOTAL_QUESTIONS);
+    score = 0;
+    currentQuestionIndex = 0;
+    document.getElementById('current-score').textContent = score;
+    showScreen('screen-ask');
+    loadQuestion();
+  }
+
+  function loadQuestion() {
+    if (currentQuestionIndex >= TOTAL_QUESTIONS) {
+      endGame();
+      return;
+    }
+    document.getElementById('question-progress').textContent = `${currentQuestionIndex + 1}/${TOTAL_QUESTIONS}`;
+    document.getElementById('current-emoji-display').textContent = gameQueue[currentQuestionIndex];
+  }
+
+  function handleAnswer(type) {
+    if (type === 'correct') {
+      score += POINTS_PER_CORRECT;
+    }
+    // Wrong and Skip give 0 points
+    
+    document.getElementById('current-score').textContent = score;
+    currentQuestionIndex++;
+    loadQuestion();
+  }
+
+  function endGame() {
+    document.getElementById('final-score').textContent = `${score} / 100 PTS`;
+    
+    let comment = "Nice try!";
+    if (score === 100) comment = "PERFECT SCORE! You guys are unstoppable! 🏆✨";
+    else if (score >= 60) comment = "Great teamwork! 🥳";
+    
+    document.getElementById('score-comment').textContent = comment;
+    showScreen('screen-score');
+  }
+
+  /* --- GUESS MODE --- */
+  function openGuessMode() {
+    const gridEl = document.getElementById('animal-num-grid');
+    gridEl.innerHTML = '';
+
+    cleanAnimals.forEach((emoji, index) => {
+      const card = document.createElement('div');
+      card.className = 'num-card';
+      
+      const badge = document.createElement('span');
+      badge.className = 'num-badge';
+      badge.textContent = `#${index + 1}`;
+      
+      const emojiEl = document.createElement('span');
+      emojiEl.className = 'num-emoji';
+      emojiEl.textContent = emoji;
+
+      card.appendChild(badge);
+      card.appendChild(emojiEl);
+      gridEl.appendChild(card);
+    });
+
+    showScreen('screen-guess');
+  }
+</script>
+
+</body>
+</html>
